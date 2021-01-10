@@ -1,0 +1,413 @@
+---
+title: "Advertisement IP"
+output: html_document
+
+
+##  Online Cryptocurency Course Ads.
+### 1. Research Question
+
+A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog. She currently targets audiences originating from various countries. In the past, she ran ads to advertise a related course on the same blog and collected data in the process. She would now like to employ your services as a Data Science Consultant to help her identify which individuals are most likely to click on her ads. 
+
+
+### 2. Metric of Success
+
+Identify individuals that are likely to click her ads.
+
+### 3. Understanding the context.
+
+The provided data has been collected from a similar online advertisement and might help create a few insights on this cryptocurrecny course advertisement. We will use the provided data to see what people like and what people go for.
+
+### 4. Recording the Experimental Design
+
+a. Data Loading
+b. Data Cleaning and preprocessing
+c. Exploratory Data Analysis
+d. Recommendations and Conclusions.
+
+### 5. Data Relevance.
+
+The provided data is relevant for this kind of study since it has a reflection of how online courses advert perform on blogs.
+
+### Data Preview
+
+#### Loading the libraries
+```{r}
+install.packages('data.table')
+install.packages('tidyverse')
+
+library(data.table)
+library(tidyverse)
+```
+#### Loading the data
+```{r}
+crypto_advertisement <- fread('http://bit.ly/IPAdvertisingData')
+crypto_advertisement
+```
+
+#### Checking on the first 6 entries
+```{r}
+head(crypto_advertisement, 6)
+```
+
+#### checking on last 6 entries
+```{r}
+tail(crypto_advertisement, 6)
+```
+
+#### checking on data types
+```{r}
+str(crypto_advertisement)
+```
+
+#### Checking on dataset description
+```{r}
+summary(crypto_advertisement)
+```
+
+#### checking the size/shape of a dataframe 
+```{r}
+dim(crypto_advertisement)
+```
+
+### Data Preprocessing.
+
+#### i. Completeness
+This is achieved by checking for missing values if any imputed to ensure correct predictions are made.
+```{r}
+is.null(crypto_advertisement)
+```
+
+##### Total number of null valuesin dataset
+```{r}
+total_null <- sum(is.na(crypto_advertisement))
+total_null
+```
+
+###### checking for missing values in every column
+```{r}
+lapply(crypto_advertisement, function(x) sum(is.na(x)))
+```
+
+#### ii. Consistency.
+Consistency is achieved when all the duplicated rows are done away with.
+```{r}
+duplicated_rows <- crypto_advertisement[duplicated(crypto_advertisement), ]
+duplicated_rows
+```
+
+```{r}
+duplicated(crypto_advertisement)
+```
+
+#### iii. Relevance.
+
+Relevance is achieved by ensuring all the features provided for the analysis are relevant to the objective Which in this case all provided features are.
+
+#### iv. Accuracy.
+
+Checking that all entries are correct.
+```{r}
+
+```
+
+#### Outliers
+We can visualize any outliers in a dataset using boxplots
+
+```{r}
+
+colnames(crypto_advertisement)
+
+```
+
+###### Renaming column names
+```{r}
+
+# Rename column where names 
+names(crypto_advertisement)[names(crypto_advertisement) == "Daily Time Spent on Site"] <- "Daily_Time_Spent_on_Site"
+names(crypto_advertisement)[names(crypto_advertisement) == "Area Income"] <- "Area_Income"
+names(crypto_advertisement)[names(crypto_advertisement) == "Daily Internet Usage"] <- "Daily_Internet_Usage"
+names(crypto_advertisement)[names(crypto_advertisement) == "Ad Topic Line"] <- "Ad_Topic_Line"
+names(crypto_advertisement)[names(crypto_advertisement) == "Clicked on Ad"] <- "Clicked_on_Ad"
+
+head(crypto_advertisement, 6)
+
+```
+
+a. Age Variable
+```{r}
+
+boxplot(crypto_advertisement$Age)
+
+```
+
+b. Daily time spent on site
+```{r}
+a <- crypto_advertisement$Daily_Time_Spent_on_Site
+boxplot(a)
+
+```
+
+c. Area Income
+```{r}
+a <- crypto_advertisement$Area_Income
+boxplot(a)
+
+```
+
+d. Daily Internet Usage
+```{r}
+b <- crypto_advertisement$Daily_Internet_Usage
+boxplot(b)
+
+```
+
+###### The Area Income has a few outliers .
+
+ To see the number of outliers
+ 
+Area Income
+```{r}
+a <- crypto_advertisement$Area_Income
+boxplot.stats(a)$out
+
+```
+The outlier entries are 8. 
+
+### Exploratory Data Analysis.
+#### Univariate Analysis.
+
+a. Daily time spent on Site
+```{r}
+mean(crypto_advertisement$Daily_Time_Spent_on_Site, trim = 0, na.rm=FALSE)
+median(crypto_advertisement$Daily_Time_Spent_on_Site,na.rm=FALSE)
+range(crypto_advertisement$Daily_Time_Spent_on_Site,na.rm=FALSE, finite=FALSE)
+quantile(crypto_advertisement$Daily_Time_Spent_on_Site, probs=seq(0, 1,0.25), na.rm=FALSE, names=TRUE, type=7)
+var(crypto_advertisement$Daily_Time_Spent_on_Site)
+sd(crypto_advertisement$Daily_Time_Spent_on_Site,na.rm=FALSE)
+```
+
+mode
+```{r}
+getmode <- function(v){
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+```
+
+```{r}
+daily_time_mode <- getmode(crypto_advertisement$Daily_Time_Spent_on_Site)
+daily_time_mode
+
+```
+
+ Visualizing time spent on Site.
+```{r}
+d <- density(crypto_advertisement$Daily_Time_Spent_on_Site, xlab="Daily_Time_Spent_on_Site")
+plot(d)
+```
+Most users spent about 80 minutes daily on the site.
+
+b. Age
+```{r}
+mean(crypto_advertisement$Age, trim = 0, na.rm=FALSE)
+median(crypto_advertisement$Age,na.rm=FALSE)
+range(crypto_advertisement$Age,na.rm=FALSE, finite=FALSE)
+quantile(crypto_advertisement$Age, probs=seq(0, 1,0.25), na.rm=FALSE, names=TRUE, type=7)
+var(crypto_advertisement$Age)
+sd(crypto_advertisement$Age,na.rm=FALSE)
+```
+
+mode
+```{r}
+daily_time_mode <- getmode(crypto_advertisement$Age)
+daily_time_mode
+
+```
+
+Age Distribution.
+```{r}
+hist(crypto_advertisement$Age, breaks=12, col="red",xlab="Ages of Users", main='Age distribution of users')
+```
+Most users are between 25 and 35 years old.
+
+
+c. Area Income
+```{r}
+mean(crypto_advertisement$Area_Income, trim = 0, na.rm=FALSE)
+median(crypto_advertisement$Area_Income,na.rm=FALSE)
+range(crypto_advertisement$Area_Income,na.rm=FALSE, finite=FALSE)
+quantile(crypto_advertisement$Area_Income, probs=seq(0, 1,0.25), na.rm=FALSE, names=TRUE, type=7)
+var(crypto_advertisement$Area_Income)
+sd(crypto_advertisement$Area_Income,na.rm=FALSE)
+```
+
+mode
+```{r}
+daily_time_mode <- getmode(crypto_advertisement$Area_Income)
+daily_time_mode
+```
+
+Area Income Distrion 
+```{r}
+areaIncome <- density(crypto_advertisement$Area_Income, xlab="Area Income")
+plot(areaIncome)
+```
+Most site users belong to an income bracket of about 60,000.
+
+d. Daily Internet Usage
+```{r}
+mean(crypto_advertisement$Daily_Internet_Usage, trim = 0, na.rm=FALSE)
+median(crypto_advertisement$Daily_Internet_Usage,na.rm=FALSE)
+range(crypto_advertisement$Daily_Internet_Usage,na.rm=FALSE, finite=FALSE)
+quantile(crypto_advertisement$Daily_Internet_Usage, probs=seq(0, 1,0.25), na.rm=FALSE, names=TRUE, type=7)
+var(crypto_advertisement$Daily_Internet_Usage)
+sd(crypto_advertisement$Daily_Internet_Usage,na.rm=FALSE)
+```
+
+mode
+```{r}
+daily_int_usage_mode <- getmode(crypto_advertisement$Daily_Internet_Usage)
+daily_time_mode
+```
+
+Daily Internet Usage
+```{r}
+daily.usage <- hist(crypto_advertisement$Daily_Internet_Usage, xlab="Daily Internet Usage")
+plot(daily.usage)
+```
+Most users who use the site have a daily internet usage of 130 min and 230.
+
+
+### Bivariate Analysis.
+Covariance 
+Covariance is the statistical representation of the degree to which two variables vary from each other.
+
+between daily time spent on site and age
+```{r}
+Daily_Time_Spent_on_Site <- crypto_advertisement$Daily_Time_Spent_on_Site
+age <- crypto_advertisement$Age 
+cov(Daily_Time_Spent_on_Site, age)
+```
+
+Covariance between daily time spent on site and area income
+```{r}
+Daily_Time_Spent_on_Site <- crypto_advertisement$Daily_Time_Spent_on_Site
+Area_Income <- crypto_advertisement$Area_Income 
+cov(Daily_Time_Spent_on_Site, Area_Income)
+```
+
+Covariance between area income on site and age
+```{r}
+Area_Income <- crypto_advertisement$Area_Income 
+age <- crypto_advertisement$Age
+cov(Area_Income, age)
+```
+
+Covariance between Daily Internet Usage on site and age
+```{r}
+Daily_Internet_Usage <- crypto_advertisement$Daily_Internet_Usage
+age <- crypto_advertisement$Age
+cov(Daily_Internet_Usage, age)
+```
+
+Covariance between Daily Internet Usage and area income
+```{r}
+Daily_Internet_Usage <- crypto_advertisement$Daily_Internet_Usage 
+Area_Income <- crypto_advertisement$Area_Income 
+cov(Daily_Internet_Usage, Area_Income)
+```
+
+####correlation
+
+#####correlation between numric variables
+```{r}
+#Numeric variables
+cor_crypto_advertisemnt <- crypto_advertisement[, c(1, 2, 3, 4, 7, 10)]
+cor_crypto_advertisemnt
+```
+
+```{r}
+cor(cor_crypto_advertisemnt)
+```
+Daily time spent on site, Daily inetrnet usage and Clicked on Ad are negarively correlated.
+
+#### Bivariate Analysis.
+1. Daily Time spent on site and Age.
+```{r}
+library(ggplot2)
+# Basic barplot
+p<-ggplot(data=crypto_advertisement, aes(x=Age, y=Daily_Time_Spent_on_Site)) +
+  geom_bar(stat="identity")
+p + coord_flip()
+```
+Daily time spent on site reduces with increase in age.
+
+2. Daily time spent on site and whether the individual clicked Ad or not.
+
+```{r}
+library(ggplot2)
+# Basic barplot
+p<-ggplot(data=crypto_advertisement, aes(x=Clicked_on_Ad, y=Daily_Time_Spent_on_Site)) +
+  geom_bar(stat="identity")
+p + coord_flip()
+```
+Most users do not click ad despite spending more time on site.
+
+
+3. Country with the most users on the site.
+```{r}
+country_ad <- crypto_advertisement[, c( 8, 10)]
+
+#Clicked Ads
+country_clicked_ad <- country_ad[which(country_ad$Clicked_on_Ad == 1)]
+
+#group bu country
+count_country <- country_clicked_ad %>% count(Country)
+country_clicked_ad <- count_country[order(-count_country$n)]
+head(country_clicked_ad, 6)
+```
+Countries with the highest number of users that clicked Ad were; Australia, Ethiopia, Turkey, Liberia , Liechtenstein and South Africa
+
+
+4. Cities with the most users
+```{r}
+city_ad <- crypto_advertisement[, c( 6, 10)]
+
+#Clicked Ads
+cities_clicked_ad <- city_ad[which(city_ad$Clicked_on_Ad == 1)]
+
+#group bu country
+count_city <- cities_clicked_ad %>% count(City)
+cities_clicked_ad <- count_city[order(-count_city$n)]
+head(cities_clicked_ad, 6)
+```
+Cities with most users that click Ad are; Lake David, Lake James, Lisamouth, Michelleside, Millerbury and Robertfurt.
+
+5. Age withmost Ad clicks
+```{r}
+age_ad <- crypto_advertisement[, c( 2, 10)]
+
+#Clicked Ads
+age_clicked_ad <- age_ad[which(age_ad$Clicked_on_Ad == 1)]
+
+#group bu country
+count_age <- age_clicked_ad %>% count(Age)
+age_clicked_ad <- count_age[order(-count_age$n)]
+head(age_clicked_ad, 6)
+```
+The age with the highest number of Ad clicks is 45, followed by 25 and 38.
+
+
+### Conclusion.
+
+From above analysis;
+
+1. Most users of such sites range between 25 and 35 years old.
+2. Most site users belong to an income bracket of about 60,000.
+3. Most users who use the site have a daily internet usage of 130 min and 230.
+4.Daily time spent on site reduces with increase in age.
+5.Most users do not click ad despite spending more time on site.
+6.Countries with the highest number of users that clicked Ad were; Australia, Ethiopia, Turkey, Liberia , Liechtenstein and South Africa
+7.Cities with most users that click Ad are; Lake David, Lake James, Lisamouth, Michelleside, Millerbury and Robertfurt.
+8. The age with the highest number of Ad clicks is 45, followed by 25 and 38.
+
